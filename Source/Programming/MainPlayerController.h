@@ -1,0 +1,60 @@
+#pragma once
+
+#include "GameFramework/PlayerController.h"
+#include "MainPlayerController.generated.h"
+
+
+UENUM()
+enum class EMouseState : uint8
+{
+	None,
+	LeftHeld,
+	RightHeld,
+	BothHeld
+
+};
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionButtonPressed, bool, Pressed);
+
+UCLASS()
+class AMainPlayerController : public APlayerController
+{
+	GENERATED_BODY()
+
+	AMainPlayerController();
+
+public:	
+	void SetupInputComponent() override;
+
+	void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetShowMouse(bool Show);
+
+	//GetInputMouseDelta - Retrieves how far the mouse moved this frame
+	//Maybe use some of this when calculating character-rotation to only rotate when the mouse is at the edge of the screen
+
+	
+	FActionButtonPressed RightActionButton;
+	FActionButtonPressed LeftActionButton;
+
+	EMouseState CurrentMS = EMouseState::None;
+
+	/*void RightActionButton(bool Pressed);
+	void LeftActionButton(bool Pressed);*/
+
+	bool bHoldsRight = false;
+	bool bHoldsLeft = false;
+private:
+	float MouseX = 0.f;
+	float MouseY = 0.f;
+
+	void RightActionButtonPressedInternal();
+	void RightActionButtonReleasedInternal();
+	void LeftActionButtonPressedInternal();
+	void LeftActionButtonReleasedInternal();
+
+};
+
+
