@@ -6,7 +6,7 @@
 #include "MainPlayerController.h"
 #include "Components/ArrowComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "HandleCameraComponent.h"
+#include "Components/HandleCameraComponent.h"
 
 
 APlayerCharacter::APlayerCharacter()
@@ -113,8 +113,8 @@ void APlayerCharacter::HandleLookHorizontal(float Value)
 	if (bRotateCamera)
 		AddControllerYawInput(Value);
 
-	if (GEngine && Value != 0)
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Emerald, FString::Printf(TEXT("Input value: %f"), Value));
+	/*if (GEngine && Value != 0)
+		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Emerald, FString::Printf(TEXT("Input value: %f"), Value));*/
 }
 
 void APlayerCharacter::HandleJump()
