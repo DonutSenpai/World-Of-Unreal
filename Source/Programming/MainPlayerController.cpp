@@ -1,9 +1,15 @@
 #include "MainPlayerController.h"
 #include "Components/InputComponent.h"
+#include "Components/HandleClickComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Components/ClickableActorBaseComponent.h"
 
 AMainPlayerController::AMainPlayerController()
 {
 	bShowMouseCursor = true;
+	HandleClick = CreateDefaultSubobject<UHandleClickComponent>("HandleClick");
+	//HandleClick->MyPC = this;
+
 }
 
 
@@ -101,4 +107,33 @@ void AMainPlayerController::LeftActionButtonReleasedInternal()
 	LeftActionButton.Broadcast(false);
 }
 
+UClickableActorBaseComponent* AMainPlayerController::MouseTraceInternal()
+{
+/*
+	FVector StartLocation, Direction;
+
+	if (!DeprojectMousePositionToWorld(StartLocation, Direction)) return nullptr;
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("%f, %f, %f"), StartLocation.X, StartLocation.Y, StartLocation.Z));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("%f, %f, %f"), Direction.X, Direction.Y, Direction.Z));
+	FHitResult Hit;
+	TArray<AActor*> IgnoreActors { };
+
+	if (UKismetSystemLibrary::LineTraceSingleByProfile(GetWorld(), StartLocation, StartLocation + Direction * 100000.f,
+		UCollisionProfile::BlockAllDynamic_ProfileName, false, IgnoreActors, EDrawDebugTrace::ForDuration, Hit, true))
+	{
+		if (UClickableActorBaseComponent* HitClickableComp = Hit.GetActor()->FindComponentByClass<UClickableActorBaseComponent>())
+		{
+			return HitClickableComp;
+		}
+	
+	}
+	else
+	{
+		return nullptr;
+	}
+
+	return nullptr;*/
+	return nullptr;
+}
 

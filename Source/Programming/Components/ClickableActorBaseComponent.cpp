@@ -14,12 +14,6 @@ void UClickableActorBaseComponent::OnClickedInternal(AActor* TouchedActor, FKey 
 	}*/
 }
 
-FClickableActorInfo UClickableActorBaseComponent::EventOnClicked_Implementation()
-{
-	//Gonna add more functionality soon
-	return ClickActorInfo;
-}
-
 void UClickableActorBaseComponent::BeginPlay()
 {
 	Super::BeginPlay();
