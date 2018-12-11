@@ -8,7 +8,7 @@ AMainPlayerController::AMainPlayerController()
 {
 	bShowMouseCursor = true;
 	HandleClick = CreateDefaultSubobject<UHandleClickComponent>("HandleClick");
-	HandleClick->MyPC = this;
+	//HandleClick->MyPC = this;
 
 }
 
@@ -105,11 +105,11 @@ void AMainPlayerController::LeftActionButtonReleasedInternal()
 
 	SetShowMouse(true);
 	LeftActionButton.Broadcast(false);
-	//MouseTraceInternal();
 }
 
 UClickableActorBaseComponent* AMainPlayerController::MouseTraceInternal()
 {
+/*
 	FVector StartLocation, Direction;
 
 	if (!DeprojectMousePositionToWorld(StartLocation, Direction)) return nullptr;
@@ -133,6 +133,7 @@ UClickableActorBaseComponent* AMainPlayerController::MouseTraceInternal()
 		return nullptr;
 	}
 
+	return nullptr;*/
 	return nullptr;
 }
 

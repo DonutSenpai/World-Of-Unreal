@@ -4,7 +4,7 @@
 #include "ClickableActorBaseComponent.generated.h"
 
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
-class UClickableActorBaseComponent : public UActorComponent, public IClickableActorInterface
+class UClickableActorBaseComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -23,8 +23,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = Values)
 	FClickableActorInfo ClickActorInfo;
 
-	UFUNCTION()
-	virtual FClickableActorInfo EventOnClicked_Implementation() override;
 
 private:
 	void BeginPlay() override;
