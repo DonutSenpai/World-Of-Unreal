@@ -22,6 +22,9 @@ void AMainPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("LeftActionButton", IE_Pressed, this, &AMainPlayerController::LeftActionButtonPressedInternal);
 	InputComponent->BindAction("LeftActionButton", IE_Released, this, &AMainPlayerController::LeftActionButtonReleasedInternal);
+	InputComponent->BindAxis("LookHorizontal", this, &AMainPlayerController::LookHorizontalInternal);
+	InputComponent->BindAxis("LookVertical", this, &AMainPlayerController::LookVerticalInternal);
+	
 }
 
 void AMainPlayerController::SetShowMouse(bool Show)
@@ -106,6 +109,17 @@ void AMainPlayerController::LeftActionButtonReleasedInternal()
 	SetShowMouse(true);
 	LeftActionButton.Broadcast(false);
 }
+
+void AMainPlayerController::LookHorizontalInternal(float Value)
+{
+	LookHorizontal.Broadcast(Value);
+}
+
+void AMainPlayerController::LookVerticalInternal(float Value)
+{
+	LookVertical.Broadcast(Value);
+}
+
 
 UClickableActorBaseComponent* AMainPlayerController::MouseTraceInternal()
 {

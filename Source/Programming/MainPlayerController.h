@@ -16,6 +16,7 @@ enum class EMouseState : uint8
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionButtonPressed, bool, Pressed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMouseInput, float, Value);
 
 UCLASS()
 class PROGRAMMING_API AMainPlayerController : public APlayerController
@@ -37,6 +38,8 @@ public:
 
 	FActionButtonPressed RightActionButton;
 	FActionButtonPressed LeftActionButton;
+	FMouseInput LookHorizontal;
+	FMouseInput LookVertical;
 
 	EMouseState CurrentMS = EMouseState::None;
 
@@ -56,6 +59,9 @@ private:
 	void RightActionButtonReleasedInternal();
 	void LeftActionButtonPressedInternal();
 	void LeftActionButtonReleasedInternal();
+
+	void LookHorizontalInternal(float Value);
+	void LookVerticalInternal(float Value);
 
 
 };

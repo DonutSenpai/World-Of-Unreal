@@ -58,6 +58,8 @@ void APlayerCharacter::BeginPlay()
 	MyPC = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
 	MyPC->RightActionButton.AddDynamic(this, &APlayerCharacter::HandleRightActionButton);
 	MyPC->LeftActionButton.AddDynamic(this, &APlayerCharacter::HandleLeftActionButton);
+	MyPC->LookVertical.AddDynamic(this, &APlayerCharacter::HandleLookVertical);
+	MyPC->LookHorizontal.AddDynamic(this, &APlayerCharacter::HandleLookHorizontal);
 
 }
 
@@ -73,8 +75,9 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::HandleMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &APlayerCharacter::HandleMoveRight);
+/*
 	PlayerInputComponent->BindAxis("LookVertical", this, &APlayerCharacter::HandleLookVertical);
-	PlayerInputComponent->BindAxis("LookHorizontal", this, &APlayerCharacter::HandleLookHorizontal);
+	PlayerInputComponent->BindAxis("LookHorizontal", this, &APlayerCharacter::HandleLookHorizontal);*/
 	PlayerInputComponent->BindAxis("CameraZoom", this, &APlayerCharacter::HandleCameraZoom);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::HandleJump);
 

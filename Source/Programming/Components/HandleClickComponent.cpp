@@ -5,6 +5,7 @@
 #include "WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "ClickableActorBaseComponent.h"
+#include "UI/SelectedActorWidget.h"
 
 void UHandleClickComponent::BeginPlay()
 {
@@ -19,7 +20,7 @@ void UHandleClickComponent::BeginPlay()
 
 void UHandleClickComponent::Click(bool Pressed)
 {
-	
+
 
 	if (Pressed)
 	{
@@ -34,10 +35,10 @@ void UHandleClickComponent::Click(bool Pressed)
 
 		if (Time != -1.f)
 		{
-				
+
 			if (MouseTrace() != nullptr)
 			{
-				
+
 				EventOnCompClicked(nullptr);
 			}
 		}
@@ -48,7 +49,9 @@ void UHandleClickComponent::Click(bool Pressed)
 
 void UHandleClickComponent::EventOnCompClicked(class UClickableActorBaseComponent* ClickedActorComp)
 {
-	SelectedActorDisplay = UWidgetBlueprintLibrary::Create(GetWorld(), SelectedActorWidgetClass, MyPC);
+	if (ClickedActorComp == nullptr) return;
+	SelectedActorDisplay = CreateWidget<USelectedActorWidget>(GetWorld(), SelectedActorWidgetClass);
+	SelectedActorDisplay->SelectedActorComp = ClickedActorComp;
 	SelectedActorDisplay->AddToViewport();
 
 }
@@ -63,13 +66,14 @@ UClickableActorBaseComponent* UHandleClickComponent::MouseTrace()
 	FHitResult Hit;
 
 	TArray<AActor*> IgnoreActors { };
-	
-	if (UKismetSystemLibrary::LineTraceSingleByProfile(GetWorld(), StartLocation, StartLocation + Direction * 100000.f,
-		UCollisionProfile::BlockAllDynamic_ProfileName, false, IgnoreActors, EDrawDebugTrace::ForDuration, Hit, true) )
-	{
-		UClickableActorBaseComponent* HitClickableComp = Hit.GetActor()->FindComponentByClass<UClickableActorBaseComponent>();
 
-		if (HitClickableComp)
+	if (UKismetSystemLibrary::LineTraceSingleByProfile(GetWorld(), StartLocation, StartLocation + Direction * 100000.f,
+		UCollisionProfile::BlockAllDynamic_ProfileName, false, IgnoreActors, EDrawDebugTrace::ForDuration, Hit, true))
+	{
+		UClickableActorBaseComponent* HitClickableComp = nullptr;
+		HitClickableComp = Hit.GetActor()->FindComponentByClass<UClickableActorBaseComponent>();
+
+		if (HitClickableComp != nullptr)
 		{
 			return HitClickableComp;
 		}
@@ -87,7 +91,8 @@ UClickableActorBaseComponent* UHandleClickComponent::MouseTrace()
 void UHandleClickComponent::CountTimeSincePress()
 {
 	Time += FApp::GetDeltaTime();
-	if (Time >= 0.2f)
+
+	if (Time >= 0.15f)
 	{
 		Time = -1.f;
 		GetWorld()->GetTimerManager().PauseTimer(TimeSincePressHandle);

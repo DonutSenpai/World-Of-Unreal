@@ -20,9 +20,9 @@ public:
 	void Click(bool Pressed);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	class TSubclassOf<UUserWidget> SelectedActorWidgetClass;
+	class TSubclassOf<class USelectedActorWidget> SelectedActorWidgetClass;
 private:
-	class UUserWidget* SelectedActorDisplay;
+	class USelectedActorWidget* SelectedActorDisplay;
 
 
 	void EventOnCompClicked(class UClickableActorBaseComponent* ClickedActorComp);

@@ -47,7 +47,9 @@ private:
 	//handles input
 	void HandleMoveForward(float Value);
 	void HandleMoveRight(float Value);
+	UFUNCTION()
 	void HandleLookVertical(float Value);
+	UFUNCTION()
 	void HandleLookHorizontal(float Value);
 	void HandleJump();
 
