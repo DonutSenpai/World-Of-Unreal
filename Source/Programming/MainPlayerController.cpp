@@ -53,15 +53,19 @@ void AMainPlayerController::RightActionButtonPressedInternal()
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, TEXT( "[RightMouseButton] Pressed" ) );
 
-	bHoldsRight = true;
 	if (CurrentMS == EMouseState::LeftHeld)
+	{
 		CurrentMS = EMouseState::BothHeld;
+	}
 
 	else if (CurrentMS == EMouseState::None)
+	{
 		CurrentMS = EMouseState::RightHeld;
+	}
+
+	MouseStateChanged.Broadcast(CurrentMS);
 
 	SetShowMouse(false);
-	RightActionButton.Broadcast(true);
 }
 
 void AMainPlayerController::RightActionButtonReleasedInternal()
@@ -69,16 +73,20 @@ void AMainPlayerController::RightActionButtonReleasedInternal()
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[RightMouseButton] Released" ) );
 
-	bHoldsRight = false;
 	if (CurrentMS == EMouseState::BothHeld)
+	{
 		CurrentMS = EMouseState::LeftHeld;
+	}
 	
 	else if (CurrentMS == EMouseState::RightHeld)
+	{
 		CurrentMS = EMouseState::None;
+	}
 
+	MouseStateChanged.Broadcast(CurrentMS);
 
 	SetShowMouse(true);
-	RightActionButton.Broadcast(false);
+
 }
 
 void AMainPlayerController::LeftActionButtonPressedInternal()
@@ -86,15 +94,20 @@ void AMainPlayerController::LeftActionButtonPressedInternal()
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("[LeftMouseButton] Pressed"));
 	
-	bHoldsLeft = true;
 	if (CurrentMS == EMouseState::RightHeld)
+	{
 		CurrentMS = EMouseState::BothHeld;
+	}
 
 	else if (CurrentMS == EMouseState::None)
+	{
 		CurrentMS = EMouseState::LeftHeld;
+	}
 
+	MouseStateChanged.Broadcast(CurrentMS);
+	
 	SetShowMouse(false);
-	LeftActionButton.Broadcast(true);
+
 }
 
 void AMainPlayerController::LeftActionButtonReleasedInternal()
@@ -102,17 +115,21 @@ void AMainPlayerController::LeftActionButtonReleasedInternal()
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[LeftMouseButton] Released" ) );
 
-	bHoldsLeft = false;
 
 	if (CurrentMS == EMouseState::BothHeld)
+	{
 		CurrentMS = EMouseState::RightHeld;
+	}
 
 	else if (CurrentMS == EMouseState::LeftHeld)
+	{
 		CurrentMS = EMouseState::None;
+	}
 
+	MouseStateChanged.Broadcast(CurrentMS);
 
 	SetShowMouse(true);
-	LeftActionButton.Broadcast(false);
+
 }
 
 UClickableActorBaseComponent* AMainPlayerController::MouseTraceInternal()

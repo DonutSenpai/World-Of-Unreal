@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "MouseStateEnum.h"
 //#include "HandleCameraComponent.h"
 #include "PlayerCharacter.generated.h"
 
@@ -52,9 +53,7 @@ private:
 	void HandleJump();
 
 	UFUNCTION()
-	void HandleRightActionButton(bool Pressed);
-	UFUNCTION()
-	void HandleLeftActionButton(bool Pressed);
+	void HandleNewMouseState(EMouseState NewState);
 
 	UFUNCTION()
 	void HandleCharacterRotation();

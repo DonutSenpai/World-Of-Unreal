@@ -1,21 +1,13 @@
 #pragma once
 
+
 #include "GameFramework/PlayerController.h"
+#include "MouseStateEnum.h"
 #include "MainPlayerController.generated.h"
 
 
-UENUM()
-enum class EMouseState : uint8
-{
-	None,
-	LeftHeld,
-	RightHeld,
-	BothHeld
-
-};
-
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionButtonPressed, bool, Pressed);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMouseStateChanged, EMouseState, NewState);
 
 UCLASS()
 class PROGRAMMING_API AMainPlayerController : public APlayerController
@@ -37,6 +29,7 @@ public:
 
 	FActionButtonPressed RightActionButton;
 	FActionButtonPressed LeftActionButton;
+	FOnMouseStateChanged MouseStateChanged;
 
 	EMouseState CurrentMS = EMouseState::None;
 
