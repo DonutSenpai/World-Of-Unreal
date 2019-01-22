@@ -50,7 +50,9 @@ void AMainPlayerController::BeginPlay()
 
 void AMainPlayerController::RightActionButtonPressedInternal()
 {
-	
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, TEXT( "[RightMouseButton] Pressed" ) );
+
 	bHoldsRight = true;
 	if (CurrentMS == EMouseState::LeftHeld)
 		CurrentMS = EMouseState::BothHeld;
@@ -64,6 +66,9 @@ void AMainPlayerController::RightActionButtonPressedInternal()
 
 void AMainPlayerController::RightActionButtonReleasedInternal()
 {
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[RightMouseButton] Released" ) );
+
 	bHoldsRight = false;
 	if (CurrentMS == EMouseState::BothHeld)
 		CurrentMS = EMouseState::LeftHeld;
@@ -78,9 +83,9 @@ void AMainPlayerController::RightActionButtonReleasedInternal()
 
 void AMainPlayerController::LeftActionButtonPressedInternal()
 {
-	/*if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Handle Left Action Button In Player Controll cpp file is fired"));
-	*/
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("[LeftMouseButton] Pressed"));
+	
 	bHoldsLeft = true;
 	if (CurrentMS == EMouseState::RightHeld)
 		CurrentMS = EMouseState::BothHeld;
@@ -94,6 +99,9 @@ void AMainPlayerController::LeftActionButtonPressedInternal()
 
 void AMainPlayerController::LeftActionButtonReleasedInternal()
 {
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[LeftMouseButton] Released" ) );
+
 	bHoldsLeft = false;
 
 	if (CurrentMS == EMouseState::BothHeld)

@@ -23,13 +23,13 @@ void UHandleClickComponent::Click(bool Pressed)
 
 	if (Pressed)
 	{
-		AddOnScreenDebugMsg("Clicked");
+		//AddOnScreenDebugMsg("Clicked");
 		Time = 0.f;
 		GetWorld()->GetTimerManager().SetTimer(TimeSincePressHandle, this, &UHandleClickComponent::CountTimeSincePress, FApp::GetDeltaTime(), true, 0.f);
 	}
 	else
 	{
-		AddOnScreenDebugMsg("Released");
+		//AddOnScreenDebugMsg("Released");
 		GetWorld()->GetTimerManager().PauseTimer(TimeSincePressHandle);
 
 		if (Time != -1.f)
