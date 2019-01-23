@@ -24,7 +24,6 @@ APlayerCharacter::APlayerCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>( TEXT( "CameraBoom" ) );
 	CameraBoom->SetupAttachment( HandleCameraComp );
-	HandleCameraComp->SetTargetCameraBoom( CameraBoom );
 
 	CameraBoom->TargetArmLength = 650.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
@@ -55,8 +54,8 @@ void APlayerCharacter::BeginPlay()
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("BeginPlay in character is run"));*/
 
-	MyPC = Cast<AMainPlayerController>( GetWorld()->GetFirstPlayerController() );
-	MyPC->MouseStateChanged.AddDynamic(this, &APlayerCharacter::HandleNewMouseState );
+	PlayerController = Cast<AMainPlayerController>( GetWorld()->GetFirstPlayerController() );
+	PlayerController->MouseStateChanged.AddDynamic(this, &APlayerCharacter::NewMouseState );
 
 }
 
@@ -64,7 +63,7 @@ void APlayerCharacter::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	HandleCameraRotation();
+	//HandleCameraRotation();
 	HandleCharacterRotation();
 }
 
@@ -90,29 +89,31 @@ void APlayerCharacter::Thing( bool yes )
 
 void APlayerCharacter::HandleMoveForward( float Value )
 {
-	if (MyPC->CurrentMS == EMouseState::BothHeld)
-		AddMovementInput( GetActorForwardVector(), 5.f );
-
-	else
-		AddMovementInput( GetActorForwardVector(), Value );
+	if (Value != 0)
+	{
+		HandleCameraComp->MovementInputOnAxis(EInputAxis::Forward, Value);
+	}
 }
 
 void APlayerCharacter::HandleMoveRight( float Value )
 {
-	AddMovementInput( GetActorRightVector(), Value );
+	if (Value != 0)
+	{
+		HandleCameraComp->MovementInputOnAxis(EInputAxis::Right, Value);
+	}
 }
 
 void APlayerCharacter::HandleLookVertical( float Value )
 {
-	if (bRotateCamera)
-		AddControllerPitchInput( -Value );
+	//if (bRotateCamera)
+		//AddControllerPitchInput( -Value );
 }
 
 void APlayerCharacter::HandleLookHorizontal( float Value )
 {
-	if (bRotateCamera)
-		AddControllerYawInput( Value );
-
+	//if (bRotateCamera)
+		//AddControllerYawInput( Value );
+	//
 	/*if (GEngine && Value != 0)
 		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Emerald, FString::Printf(TEXT("Input value: %f"), Value));*/
 }
@@ -123,8 +124,11 @@ void APlayerCharacter::HandleJump()
 }
 
 
-void APlayerCharacter::HandleNewMouseState( EMouseState NewState )
+void APlayerCharacter::NewMouseState( EMouseState NewState )
 {
+	//HandleCameraComp::Execute_NewMouseState(NewState);
+
+	HandleCameraComp->NewMouseState( NewState );
 
 	switch (NewState)
 	{
@@ -159,7 +163,7 @@ void APlayerCharacter::HandleCameraRotation()
 
 	float thing = 6.f;
 
-	if (InputComponent->GetAxisValue( "MoveForward" ) != 0 && MyPC->CurrentMS == EMouseState::None && !(InputComponent->GetAxisValue( "LookHorizontal" ) != 0))
+	if (InputComponent->GetAxisValue( "MoveForward" ) != 0 && PlayerController->CurrentMS == EMouseState::None && !(InputComponent->GetAxisValue( "LookHorizontal" ) != 0))
 	{
 		float AngleRight = GetControllerAngleDifference( true );
 		float AngleUp = FMath::Clamp( GetControllerAngleDifference( false ), 0.f, 20.f );
@@ -168,7 +172,7 @@ void APlayerCharacter::HandleCameraRotation()
 
 		FRotator NewControlRotation = FMath::RInterpConstantTo( GetControlRotation(), TargetRotation, FApp::GetDeltaTime(), 250.f );
 
-		MyPC->SetControlRotation( NewControlRotation );
+		PlayerController->SetControlRotation( NewControlRotation );
 	}
 }
 
@@ -197,7 +201,7 @@ float APlayerCharacter::GetControllerAngleDifference( bool AngleRightOrUp /*= tr
 void APlayerCharacter::HandleCharacterRotation()
 {
 	//Calculate things for holding down right
-	if (MyPC->CurrentMS == EMouseState::RightHeld || MyPC->CurrentMS == EMouseState::BothHeld)
+	if (PlayerController->CurrentMS == EMouseState::RightHeld || PlayerController->CurrentMS == EMouseState::BothHeld)
 	{
 		//resetting variables
 		RotationLerpSpeed = 0.f;

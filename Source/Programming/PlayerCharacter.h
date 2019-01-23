@@ -3,22 +3,24 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "MouseStateEnum.h"
-//#include "HandleCameraComponent.h"
+#include "Interfaces/MouseStateInterface.h"
 #include "PlayerCharacter.generated.h"
 
 
 UCLASS()
-class APlayerCharacter : public ACharacter
+class APlayerCharacter : public ACharacter, public FMouseStateInterface
 {
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere)
 	class UHandleCameraComponent* HandleCameraComp;
 
 public:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* FollowCamera;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 	
@@ -53,7 +55,7 @@ private:
 	void HandleJump();
 
 	UFUNCTION()
-	void HandleNewMouseState(EMouseState NewState);
+	void NewMouseState(EMouseState NewState);
 
 	UFUNCTION()
 	void HandleCharacterRotation();
@@ -88,7 +90,7 @@ private:
 
 
 	
-	class AMainPlayerController *MyPC;
-
+public:
+	class AMainPlayerController *PlayerController;
 
 };

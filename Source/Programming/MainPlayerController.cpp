@@ -50,8 +50,9 @@ void AMainPlayerController::BeginPlay()
 
 void AMainPlayerController::RightActionButtonPressedInternal()
 {
+/*
 	if (GEngine)
-		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, TEXT( "[RightMouseButton] Pressed" ) );
+		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, TEXT( "[RightMouseButton] Pressed" ) );*/
 
 	if (CurrentMS == EMouseState::LeftHeld)
 	{
@@ -70,8 +71,9 @@ void AMainPlayerController::RightActionButtonPressedInternal()
 
 void AMainPlayerController::RightActionButtonReleasedInternal()
 {
+/*
 	if (GEngine)
-		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[RightMouseButton] Released" ) );
+		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[RightMouseButton] Released" ) );*/
 
 	if (CurrentMS == EMouseState::BothHeld)
 	{
@@ -91,8 +93,9 @@ void AMainPlayerController::RightActionButtonReleasedInternal()
 
 void AMainPlayerController::LeftActionButtonPressedInternal()
 {
+/*
 	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("[LeftMouseButton] Pressed"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("[LeftMouseButton] Pressed"));*/
 	
 	if (CurrentMS == EMouseState::RightHeld)
 	{
@@ -112,8 +115,9 @@ void AMainPlayerController::LeftActionButtonPressedInternal()
 
 void AMainPlayerController::LeftActionButtonReleasedInternal()
 {
+/*
 	if (GEngine)
-		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[LeftMouseButton] Released" ) );
+		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[LeftMouseButton] Released" ) );*/
 
 
 	if (CurrentMS == EMouseState::BothHeld)
