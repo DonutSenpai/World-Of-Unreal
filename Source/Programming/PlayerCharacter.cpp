@@ -55,7 +55,7 @@ void APlayerCharacter::BeginPlay()
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("BeginPlay in character is run"));*/
 
 	PlayerController = Cast<AMainPlayerController>( GetWorld()->GetFirstPlayerController() );
-	PlayerController->MouseStateChanged.AddDynamic(this, &APlayerCharacter::NewMouseState );
+	PlayerController->MouseStateChanged.AddDynamic( this, &APlayerCharacter::NewMouseState );
 
 }
 
@@ -89,18 +89,16 @@ void APlayerCharacter::Thing( bool yes )
 
 void APlayerCharacter::HandleMoveForward( float Value )
 {
-	if (Value != 0)
-	{
-		HandleCameraComp->MovementInputOnAxis(EInputAxis::Forward, Value);
-	}
+
+	HandleCameraComp->MovementInputForwardAxis( Value );
+
 }
 
 void APlayerCharacter::HandleMoveRight( float Value )
 {
-	if (Value != 0)
-	{
-		HandleCameraComp->MovementInputOnAxis(EInputAxis::Right, Value);
-	}
+
+	HandleCameraComp->MovementInputRightAxis( Value );
+
 }
 
 void APlayerCharacter::HandleLookVertical( float Value )
@@ -132,28 +130,28 @@ void APlayerCharacter::NewMouseState( EMouseState NewState )
 
 	switch (NewState)
 	{
-		case EMouseState::None:
-			{
-				bRotateCamera = false;
-				break;
-			}
+	case EMouseState::None:
+	{
+		bRotateCamera = false;
+		break;
+	}
 
-		case EMouseState::LeftHeld:
-			{
-				bRotateCamera = true;
-				break;
-			}
+	case EMouseState::LeftHeld:
+	{
+		bRotateCamera = true;
+		break;
+	}
 
-		case EMouseState::RightHeld:
-			{
-				bRotateCamera = true;
-				break;
-			}
+	case EMouseState::RightHeld:
+	{
+		bRotateCamera = true;
+		break;
+	}
 
-		case EMouseState::BothHeld:
-			{
-				break;
-			}
+	case EMouseState::BothHeld:
+	{
+		break;
+	}
 	}
 
 }

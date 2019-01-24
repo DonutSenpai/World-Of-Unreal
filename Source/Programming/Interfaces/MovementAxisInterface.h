@@ -1,15 +1,11 @@
 #pragma once
 
-UENUM()
-enum class EInputAxis
-{
-	Forward,
-	Right
-};
 
 class FMovementAxisInterface
 {
 public:
-	virtual void MovementInputOnAxis( EInputAxis InputOnAxis, float AxisValue ) = 0;
+
+	virtual void MovementInputRightAxis( float AxisValue ) = 0;
+	virtual void MovementInputForwardAxis( float AxisValue ) = 0;
 
 };

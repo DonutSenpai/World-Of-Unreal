@@ -19,12 +19,19 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 		float CameraZoomSpeed = 150.f;
 
+	void BeginPlay() override;
 //code publics
 public:
 
 	void NewMouseState(EMouseState NewState);
 
-	void MovementInputOnAxis(EInputAxis InputOnAxis, float AxisValue);
+	void MovementInputRightAxis( float AxisValue );
+	void MovementInputForwardAxis( float AxisValue );
+	bool bInputOnRightAxis = false;
+	bool bInputOnForwardAxis = false;
+
+	void GetControllerAngleDifference( bool AngleRightOrUp /*= true*/ );
+
 
 	//void NewMouseState_Implementation(EMouseState NewState);
 
@@ -52,6 +59,5 @@ private:
 	float CameraBoomMaxLength = 900.f;
 	float NewCameraBoomLength = 0.f;
 
-	void BeginPlay() override;
 
 };

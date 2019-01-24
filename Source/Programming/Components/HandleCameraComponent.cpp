@@ -5,9 +5,26 @@
 #include "Debug.h"
 #include "MainPlayerController.h"
 
+#define PauseTimerHandle(x) GetWorld()->GetTimerManager().PauseTimer(x)
+#define UnpauseTimerHandle(x) GetWorld()->GetTimerManager().UnPauseTimer(x)
+#define IsTimerHandleActive(x) GetWorld()->GetTimerManager().IsTimerActive(x)
+
 UHandleCameraComponent::UHandleCameraComponent()
 {
 	//Dothing
+}
+
+void UHandleCameraComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	/*ensureMsgf(TargetBoom != nullptr, TEXT("You need to make sure the TargetBoom is set using the 'SetTargetCameraBoom' function"));
+	ensureMsgf(OwnChar != nullptr, TEXT("You need to make sure the owning character reference is set using the 'SetOwningCharacter' function"));
+*/
+
+	GetWorld()->GetTimerManager().SetTimer( RotateCameraFromInputHandle, this,
+		&UHandleCameraComponent::RotateCameraFromInput, FApp::GetDeltaTime(), true );
+
+	PauseTimerHandle(RotateCameraFromInputHandle);
 }
 
 void UHandleCameraComponent::NewMouseState( EMouseState NewState )
@@ -18,33 +35,83 @@ void UHandleCameraComponent::NewMouseState( EMouseState NewState )
 	{
 	case EMouseState::None:
 	{
+		if (IsTimerHandleActive(RotateCameraFromInputHandle))
+		{
+			PauseTimerHandle(RotateCameraFromInputHandle);		
+		}
+
 		break;
 	}
 
 	case EMouseState::LeftHeld:
 	{
-		GetWorld()->GetTimerManager().SetTimer(RotateCameraFromInputHandle, this, 
-			&UHandleCameraComponent::RotateCameraFromInput, FApp::GetDeltaTime(), true);
+		if (!IsTimerHandleActive(RotateCameraFromInputHandle))
+		{
+			UnpauseTimerHandle(RotateCameraFromInputHandle);
+		}
+
 		break;
 	}
 
 	case EMouseState::RightHeld:
 	{
+		if (!IsTimerHandleActive( RotateCameraFromInputHandle ))
+		{
+			UnpauseTimerHandle( RotateCameraFromInputHandle );
+		}
 
 		break;
 	}
 
 	case EMouseState::BothHeld:
 	{
+
+		if (!IsTimerHandleActive( RotateCameraFromInputHandle ))
+		{
+			UnpauseTimerHandle( RotateCameraFromInputHandle );
+		}
+
 		break;
 	}
+
 	}
 }
 
+void UHandleCameraComponent::MovementInputRightAxis( float AxisValue )
+{
+	bInputOnRightAxis = AxisValue != 0;
+
+	if (!bInputOnRightAxis) return;
+
+	if (bInputOnRightAxis && !bInputOnForwardAxis)
+	{
+		OwnChar->PlayerController->AddYawInput( AxisValue );
+	}
+
+	if (GEngine)
+	{
+
+		GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Emerald, FString::Printf( TEXT( "Input on RightAxis: %d" ),
+			bInputOnRightAxis ) );
+	}
+}
+
+void UHandleCameraComponent::MovementInputForwardAxis( float AxisValue )
+{
+	bInputOnForwardAxis = AxisValue != 0;
+
+	if (!bInputOnForwardAxis) return;
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, FString::Printf( TEXT( "Input on ForwardAxis: %d" ),
+			bInputOnForwardAxis ) );
+	}
 
 
+}
 
-void UHandleCameraComponent::MovementInputOnAxis( EInputAxis InputOnAxis, float AxisValue )
+void UHandleCameraComponent::GetControllerAngleDifference( bool AngleRightOrUp /*= true*/ )
 {
 
 }
@@ -97,15 +164,6 @@ void UHandleCameraComponent::CameraZoomLerp()
 			GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, FString::Printf( TEXT( "Fuck shit up: %f" ), OwnChar->CameraBoom->TargetArmLength ) );
 		GetWorld()->GetTimerManager().ClearTimer( CameraZoomLerpHandle );
 	}
-
-}
-
-void UHandleCameraComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	/*ensureMsgf(TargetBoom != nullptr, TEXT("You need to make sure the TargetBoom is set using the 'SetTargetCameraBoom' function"));
-	ensureMsgf(OwnChar != nullptr, TEXT("You need to make sure the owning character reference is set using the 'SetOwningCharacter' function"));
-*/
 
 }
 
