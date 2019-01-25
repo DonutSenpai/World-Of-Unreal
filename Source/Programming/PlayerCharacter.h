@@ -16,6 +16,9 @@ class APlayerCharacter : public ACharacter, public FMouseStateInterface
 	UPROPERTY(VisibleAnywhere)
 	class UHandleCameraComponent* HandleCameraComp;
 
+	UPROPERTY(VisibleAnywhere)
+	class UHandleCharacterRotationComponent* CharacterRotationComp;
+
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -52,6 +55,7 @@ private:
 	void HandleMoveRight(float Value);
 	void HandleLookVertical(float Value);
 	void HandleLookHorizontal(float Value);
+
 	void HandleJump();
 
 	UFUNCTION()
@@ -61,13 +65,9 @@ private:
 	void HandleCharacterRotation();
 	void SetCharacterRotationInternal(FRotator RotationToSet, float LerpSpeed = 0.f);	
 
+/*
 	UFUNCTION()
-	void HandleCameraRotation();
-
-	//Gets the angle difference in degrees between this actor and the controller
-	// @param AngleRightOrUp returns angle right if true and angle up if false
-	// @Param bSigned returns a signed angle instead of an absolute value of the angle
-	float GetControllerAngleDifference(bool bAngleRightOrUp = true);
+	void HandleCameraRotation();*/
 
 private:
 	
@@ -81,7 +81,6 @@ private:
 	FTimerHandle CharacterRotationHandle;
 	FTimerHandle CameraRotationhandle;
 
-	bool bRotateCamera = false;
 	bool bAutoRun = false;
 
 	//Just camera boom and zoom things

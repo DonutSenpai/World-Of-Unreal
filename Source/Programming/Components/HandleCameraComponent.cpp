@@ -83,17 +83,19 @@ void UHandleCameraComponent::MovementInputRightAxis( float AxisValue )
 
 	if (!bInputOnRightAxis) return;
 
-	if (bInputOnRightAxis && !bInputOnForwardAxis)
+	if (CurrentMS == EMouseState::None && bInputOnRightAxis && !bInputOnForwardAxis)
 	{
-		OwnChar->PlayerController->AddYawInput( AxisValue );
+		OwnChar->PlayerController->AddYawInput( AxisValue/2.f );
 	}
 
+
+/*
 	if (GEngine)
 	{
 
 		GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Emerald, FString::Printf( TEXT( "Input on RightAxis: %d" ),
 			bInputOnRightAxis ) );
-	}
+	}*/
 }
 
 void UHandleCameraComponent::MovementInputForwardAxis( float AxisValue )
@@ -102,12 +104,14 @@ void UHandleCameraComponent::MovementInputForwardAxis( float AxisValue )
 
 	if (!bInputOnForwardAxis) return;
 
+
+/*
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, FString::Printf( TEXT( "Input on ForwardAxis: %d" ),
 			bInputOnForwardAxis ) );
 	}
-
+*/
 
 }
 

@@ -7,23 +7,20 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/HandleCameraComponent.h"
+#include "Components/HandleCharacterRotationComponent.h"
 
 
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	//Set size for collision capsule
-	//GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
 	HandleCameraComp = CreateDefaultSubobject<UHandleCameraComponent>( "HandleCameraComponent" );
 	HandleCameraComp->SetupAttachment( RootComponent );
 	HandleCameraComp->SetOwningCharacter( this );
 
-
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>( TEXT( "CameraBoom" ) );
-	CameraBoom->SetupAttachment( HandleCameraComp );
+	CameraBoom->SetupAttachment( RootComponent);
 
 	CameraBoom->TargetArmLength = 650.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
@@ -33,9 +30,12 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetupAttachment( CameraBoom, USpringArmComponent::SocketName ); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = true; // Camera does not rotate relative to arm
 
+
+	CharacterRotationComp = CreateDefaultSubobject<UHandleCharacterRotationComponent>( "CharacterRotationComp" );
+
 	MyArrow = CreateDefaultSubobject<UArrowComponent>( "MyArrow" );
 	MyArrow->SetupAttachment( RootComponent );
-	//MyArrow->bHiddenInGame = false;
+	MyArrow->bHiddenInGame = false;
 	MyArrow->ArrowSize = 2.f;
 
 	MyOtherArrow = CreateDefaultSubobject<UArrowComponent>( "MyOtherArrow" );
@@ -64,7 +64,7 @@ void APlayerCharacter::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 	//HandleCameraRotation();
-	HandleCharacterRotation();
+	//HandleCharacterRotation();
 }
 
 void APlayerCharacter::SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent )
@@ -74,6 +74,7 @@ void APlayerCharacter::SetupPlayerInputComponent( class UInputComponent* PlayerI
 	PlayerInputComponent->BindAxis( "MoveRight", this, &APlayerCharacter::HandleMoveRight );
 	PlayerInputComponent->BindAxis( "LookVertical", this, &APlayerCharacter::HandleLookVertical );
 	PlayerInputComponent->BindAxis( "LookHorizontal", this, &APlayerCharacter::HandleLookHorizontal );
+
 	PlayerInputComponent->BindAxis( "CameraZoom", this, &APlayerCharacter::HandleCameraZoom );
 	PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &APlayerCharacter::HandleJump );
 
@@ -89,31 +90,24 @@ void APlayerCharacter::Thing( bool yes )
 
 void APlayerCharacter::HandleMoveForward( float Value )
 {
-
 	HandleCameraComp->MovementInputForwardAxis( Value );
-
+	CharacterRotationComp->MovementInputForwardAxis( Value );
 }
 
 void APlayerCharacter::HandleMoveRight( float Value )
 {
-
 	HandleCameraComp->MovementInputRightAxis( Value );
-
+	CharacterRotationComp->MovementInputRightAxis( Value );
 }
 
 void APlayerCharacter::HandleLookVertical( float Value )
 {
-	//if (bRotateCamera)
-		//AddControllerPitchInput( -Value );
+
 }
 
 void APlayerCharacter::HandleLookHorizontal( float Value )
 {
-	//if (bRotateCamera)
-		//AddControllerYawInput( Value );
-	//
-	/*if (GEngine && Value != 0)
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Emerald, FString::Printf(TEXT("Input value: %f"), Value));*/
+
 }
 
 void APlayerCharacter::HandleJump()
@@ -127,24 +121,25 @@ void APlayerCharacter::NewMouseState( EMouseState NewState )
 	//HandleCameraComp::Execute_NewMouseState(NewState);
 
 	HandleCameraComp->NewMouseState( NewState );
+	CharacterRotationComp->NewMouseState( NewState );
 
 	switch (NewState)
 	{
 	case EMouseState::None:
 	{
-		bRotateCamera = false;
+
 		break;
 	}
 
 	case EMouseState::LeftHeld:
 	{
-		bRotateCamera = true;
+
 		break;
 	}
 
 	case EMouseState::RightHeld:
 	{
-		bRotateCamera = true;
+
 		break;
 	}
 
@@ -156,6 +151,7 @@ void APlayerCharacter::NewMouseState( EMouseState NewState )
 
 }
 
+/*
 void APlayerCharacter::HandleCameraRotation()
 {
 
@@ -172,29 +168,8 @@ void APlayerCharacter::HandleCameraRotation()
 
 		PlayerController->SetControlRotation( NewControlRotation );
 	}
-}
+}*/
 
-float APlayerCharacter::GetControllerAngleDifference( bool AngleRightOrUp /*= true*/ )
-{
-	if (AngleRightOrUp)
-	{
-		FVector ControlYaw = FRotator( 0.f, GetControlRotation().Yaw, 0.f ).Vector();
-		float DotProductYaw = FVector::DotProduct( ControlYaw, GetActorForwardVector() );
-		float DotProductYawRight = FVector::DotProduct( ControlYaw, GetActorRightVector() );
-		float AngleRight = FMath::RadiansToDegrees( FMath::Acos( DotProductYaw ) ) * (DotProductYawRight < 0 ? -1 : 1);
-
-		return AngleRight;
-	}
-
-	else
-	{
-		FVector ControlPitch = FRotator( GetControlRotation().Pitch, 0.f, 0.f ).Vector();
-		float DotProductPitchUp = FVector::DotProduct( ControlPitch, GetActorUpVector() );
-		float AngleUp = FMath::RadiansToDegrees( FMath::Acos( DotProductPitchUp ) ) - 90.f;
-
-		return AngleUp;
-	}
-}
 
 void APlayerCharacter::HandleCharacterRotation()
 {
