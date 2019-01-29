@@ -30,8 +30,8 @@ void UHandleCharacterRotationComponent::NewMouseState( EMouseState NewState )
 	{
 		if (PreviousState == EMouseState::RightHeld)
 		{
-			GetWorld()->GetTimerManager().SetTimer( RotationHandle, this,
-				&UHandleCharacterRotationComponent::LerpToCameraRotation, FApp::GetDeltaTime(), true );
+			//GetWorld()->GetTimerManager().SetTimer( RotationHandle, this,
+				//&UHandleCharacterRotationComponent::LerpToCameraRotation, FApp::GetDeltaTime(), true );
 		}
 
 		break;
@@ -61,7 +61,21 @@ void UHandleCharacterRotationComponent::NewMouseState( EMouseState NewState )
 
 void UHandleCharacterRotationComponent::MovementInputRightAxis( float AxisValue )
 {
+	if (CurrentMS == EMouseState::None)
+	{
+		float Angle = GetControllerRightAngleDifference();
 
+		if ( Angle < 0 ? FMath::IsNearlyEqual(Angle, -45, 1) : FMath::IsNearlyEqual(Angle, 45, 1) )
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%f"),Angle/Angle);
+		}
+		
+
+		FRotator RotationToSet = OwnChar->GetActorRotation() + FRotator( 0.f, 1.f, 0.f ) * AxisValue;
+		//RotationToAdd *= AxisValue;
+
+		OwnChar->SetActorRotation( RotationToSet );
+	}
 }
 
 void UHandleCharacterRotationComponent::MovementInputForwardAxis( float AxisValue )
@@ -104,15 +118,48 @@ void UHandleCharacterRotationComponent::LerpCharacterRotation( FRotator TargetRo
 
 }
 
+//This doesn't work yet, but I'll leave it for now
 void UHandleCharacterRotationComponent::LerpToCameraRotation()
 {
+	return;
 	//dot controller forward with character actor forward 
+/*
+	FVector NormalizedControlLookDir = OwnChar->GetControlRotation().Vector();
+	NormalizedControlLookDir.Normalize();
+
+	float Vector = FVector::DotProduct(NormalizedControlLookDir, OwnChar->GetActorForwardVector() );
+	float DegreesToRotate = FMath::RadiansToDegrees(FMath::Acos(Vector));
+	FVector TargetVec = OwnChar->GetActorForwardVector().RotateAngleAxis( DegreesToRotate, FVector( 0.f, 0.f, 1.f ) );
+
+*/
 
 
-	FVector TargetVec = OwnChar->GetActorForwardVector().RotateAngleAxis( GetControllerRightAngleDifference(), FVector( 0.f, 0.f, 1.f ) );
-	FRotator NewRot = FMath::RInterpTo( OwnChar->GetActorRotation(), TargetVec.Rotation(), FApp::GetDeltaTime(), 2.f );
 
 
-	OwnChar->SetActorRotation( NewRot );
+	float RotationValue = GetControllerRightAngleDifference() * -1 * FApp::GetDeltaTime();
+	FQuat RotationToAdd = FQuat( FVector( 0.f, 0.f, 1.f ), RotationValue );
+
+	UE_LOG( LogTemp, Warning, TEXT( "%f %f %f %f" ), RotationToAdd.X, RotationToAdd.Y, RotationToAdd.Z, RotationToAdd.W );
+
+
+	/*
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, FString::Printf( TEXT( "Controller Rotation: %f %f %f" ),
+				OwnChar->GetControlRotation().Pitch, OwnChar->GetControlRotation().Yaw, OwnChar->GetControlRotation().Roll ) );
+		}
+	*/
+	if (OwnChar->GetControlRotation() != OwnChar->GetControlRotation())
+	{
+		UE_LOG( LogTemp, Warning, TEXT( "Control Rotation: %d %d %d" ), OwnChar->GetControlRotation().Pitch, OwnChar->GetControlRotation().Yaw, OwnChar->GetControlRotation().Roll );
+	}
+
+	if (!FMath::IsNearlyEqual( GetControllerRightAngleDifference(), 0, 1.f ))
+	{
+		//OwnChar->AddActorWorldRotation(RotationToAdd);
+
+	}
+
+	//OwnChar->SetActorRotation( NewRot );
 }
 

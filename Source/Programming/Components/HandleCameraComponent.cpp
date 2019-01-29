@@ -85,7 +85,7 @@ void UHandleCameraComponent::MovementInputRightAxis( float AxisValue )
 
 	if (CurrentMS == EMouseState::None && bInputOnRightAxis && !bInputOnForwardAxis)
 	{
-		OwnChar->PlayerController->AddYawInput( AxisValue/2.f );
+		OwnChar->PlayerController->AddYawInput( AxisValue/3.f );
 	}
 
 
