@@ -9,4 +9,5 @@ public:
 	virtual void NewMouseState(EMouseState NewState) = 0;
 
 	EMouseState CurrentMS = EMouseState::None;
+	EMouseState PreviousMS = EMouseState::None;
 };

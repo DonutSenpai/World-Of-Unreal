@@ -27,8 +27,6 @@ public:
 
 	void MovementInputRightAxis( float AxisValue );
 	void MovementInputForwardAxis( float AxisValue );
-	bool bInputOnRightAxis = false;
-	bool bInputOnForwardAxis = false;
 
 	void GetControllerAngleDifference( bool AngleRightOrUp /*= true*/ );
 

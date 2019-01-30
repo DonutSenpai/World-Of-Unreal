@@ -13,6 +13,7 @@
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	HandleCameraComp = CreateDefaultSubobject<UHandleCameraComponent>( "HandleCameraComponent" );
 	HandleCameraComp->SetupAttachment( RootComponent );
@@ -20,7 +21,7 @@ APlayerCharacter::APlayerCharacter()
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>( TEXT( "CameraBoom" ) );
-	CameraBoom->SetupAttachment( RootComponent);
+	CameraBoom->SetupAttachment( RootComponent );
 
 	CameraBoom->TargetArmLength = 650.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
@@ -176,7 +177,8 @@ void APlayerCharacter::HandleCameraRotation()
 void APlayerCharacter::HandleCharacterRotation()
 {
 	//Calculate things for holding down right
-	if (PlayerController->CurrentMS == EMouseState::RightHeld || PlayerController->CurrentMS == EMouseState::BothHeld)
+	if (PlayerController->CurrentMS == EMouseState::RightHeld ||
+		PlayerController->CurrentMS == EMouseState::BothHeld)
 	{
 		//resetting variables
 		RotationLerpSpeed = 0.f;

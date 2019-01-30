@@ -10,11 +10,19 @@ class UHandleCharacterRotationComponent : public UActorComponent, public FMouseS
 {
 	GENERATED_BODY()
 
+	UHandleCharacterRotationComponent();
+
+
 	//Owning PlayerCharacter
 	class APlayerCharacter* OwnChar = nullptr;
 
 	void BeginPlay() override;
 
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction) override;
+
+protected:
+	float GetControllerRightAngleDifference();
+	float GetControllerUpAngleDifference();
 
 	//"Interface" functions
 public:
@@ -25,15 +33,27 @@ public:
 	void MovementInputForwardAxis( float AxisValue );
 
 protected:
+	UFUNCTION()
+	void HandleRotation();
 
-	float GetControllerRightAngleDifference();
-	float GetControllerUpAngleDifference();
-
-	void SetCharacterRotation();
+	bool bRotateToCamera = false;
+	float LerpAlpha = 0.f;
+	float LerpSpeed = 45.f;
 	FTimerHandle RotationHandle;
 
-	void LerpCharacterRotation(FRotator TargetRotation);
-	void LerpToCameraRotation();
-	float LerpSpeed = 45.f;
+
+protected:
+
+
+	void SetCharacterRotation();
+
+	//Rotate X degrees
+	void RotateDegrees(float Degrees);
+	//Rotate to keep X degrees difference from controller rotation
+	void RotateKeepDegrees(float Degrees);
+
+	UFUNCTION()
+	void LerpSetRotation(FRotator TargetRotation);
+
 
 };
