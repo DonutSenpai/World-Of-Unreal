@@ -41,11 +41,13 @@ protected:
 	float LerpSpeed = 45.f;
 	FTimerHandle RotationHandle;
 
+	float PreviousAxisValue = 0.f;
+
 
 protected:
 
 
-	void SetCharacterRotation();
+	void LerpToCameraRot();
 
 	//Rotate X degrees
 	void RotateDegrees(float Degrees);

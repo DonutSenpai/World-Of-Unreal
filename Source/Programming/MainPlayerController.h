@@ -6,8 +6,8 @@
 #include "MainPlayerController.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionButtonPressed, bool, Pressed);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMouseStateChanged, EMouseState, NewState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FActionButtonPressed, bool, Pressed );
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam( FOnMouseStateChanged, EMouseState, NewState );
 
 UCLASS()
 class PROGRAMMING_API AMainPlayerController : public APlayerController
@@ -16,13 +16,13 @@ class PROGRAMMING_API AMainPlayerController : public APlayerController
 
 	AMainPlayerController();
 
-public:	
+public:
 	void SetupInputComponent() override;
 
 	void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
-	void SetShowMouse(bool Show);
+	UFUNCTION( BlueprintCallable )
+	void SetShowMouse( bool Show );
 
 	//GetInputMouseDelta - Retrieves how far the mouse moved this frame
 	//Maybe use some of this when calculating character-rotation to only rotate when the mouse is at the edge of the screen
@@ -38,7 +38,7 @@ public:
 
 	class UClickableActorBaseComponent* MouseTraceInternal();
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	UPROPERTY( BlueprintReadOnly, VisibleAnywhere )
 	class UHandleClickComponent* HandleClick = nullptr;
 
 private:
@@ -49,6 +49,7 @@ private:
 	void RightActionButtonReleasedInternal();
 	void LeftActionButtonPressedInternal();
 	void LeftActionButtonReleasedInternal();
+
 
 
 };

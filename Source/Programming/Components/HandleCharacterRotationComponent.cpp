@@ -23,7 +23,7 @@ void UHandleCharacterRotationComponent::BeginPlay()
 
 
 	GetWorld()->GetTimerManager().SetTimer( RotationHandle, this,
-		&UHandleCharacterRotationComponent::SetCharacterRotation, FApp::GetDeltaTime(), true );
+		&UHandleCharacterRotationComponent::LerpToCameraRot, FApp::GetDeltaTime(), true );
 
 	PauseTimerHandle( RotationHandle );
 
@@ -34,9 +34,12 @@ void UHandleCharacterRotationComponent::TickComponent( float DeltaTime, enum ELe
 {
 	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
+	if ( bInputOnRightAxis && !bInputOnForwardAxis ) CurrentMAS = EMovementAxisState::Right;
+	if ( bInputOnForwardAxis && !bInputOnRightAxis ) CurrentMAS = EMovementAxisState::Forward;
+	if ( bInputOnForwardAxis && bInputOnRightAxis ) CurrentMAS = EMovementAxisState::ForwardRight;
+	if ( !bInputOnForwardAxis && !bInputOnRightAxis ) CurrentMAS = EMovementAxisState::None;
+
 	HandleRotation();
-
-
 }
 
 float UHandleCharacterRotationComponent::GetControllerRightAngleDifference()
@@ -44,7 +47,7 @@ float UHandleCharacterRotationComponent::GetControllerRightAngleDifference()
 	FVector ControlYaw = FRotator( 0.f, OwnChar->GetControlRotation().Yaw, 0.f ).Vector();
 	float DotProductYaw = FVector::DotProduct( ControlYaw, OwnChar->GetActorForwardVector() );
 	float DotProductYawRight = FVector::DotProduct( ControlYaw, OwnChar->GetActorRightVector() );
-	float AngleRight = FMath::RadiansToDegrees( FMath::Acos( DotProductYaw ) ) * (DotProductYawRight < 0 ? -1 : 1);
+	float AngleRight = FMath::RadiansToDegrees( FMath::Acos( DotProductYaw ) ) * ( DotProductYawRight < 0 ? -1 : 1 );
 
 	return AngleRight;
 
@@ -68,17 +71,17 @@ void UHandleCharacterRotationComponent::NewMouseState( EMouseState NewState )
 	PreviousMS = CurrentMS;
 	CurrentMS = NewState;
 
-	if (NewState != EMouseState::None)
+	if ( NewState != EMouseState::None )
 	{
 		bRotateToCamera = false;
 	}
 
 
-	switch (NewState)
+	switch ( NewState )
 	{
 	case EMouseState::None:
 	{
-		if (PreviousMS == EMouseState::RightHeld)
+		if ( PreviousMS == EMouseState::RightHeld )
 		{
 			bRotateToCamera = true;
 			/*GetWorld()->GetTimerManager().SetTimer( RotationHandle, this,
@@ -114,7 +117,11 @@ void UHandleCharacterRotationComponent::NewMouseState( EMouseState NewState )
 
 void UHandleCharacterRotationComponent::MovementInputRightAxis( float AxisValue )
 {
+	//if (PreviousAxisValue)
+
 	bInputOnRightAxis = AxisValue != 0;
+
+	PreviousAxisValue = AxisValue;
 }
 
 void UHandleCharacterRotationComponent::MovementInputForwardAxis( float AxisValue )
@@ -124,9 +131,14 @@ void UHandleCharacterRotationComponent::MovementInputForwardAxis( float AxisValu
 
 
 
-void UHandleCharacterRotationComponent::SetCharacterRotation()
+void UHandleCharacterRotationComponent::LerpToCameraRot()
 {
-
+	if ( FMath::IsNearlyEqual( GetControllerRightAngleDifference(), 0.f, 0.01f ) )
+	{
+		PauseTimerHandle( RotationHandle );
+		return;
+	}
+	RotateDegrees( -GetControllerRightAngleDifference() );
 }
 
 void UHandleCharacterRotationComponent::RotateDegrees( float Degrees )
@@ -141,8 +153,10 @@ void UHandleCharacterRotationComponent::RotateDegrees( float Degrees )
 
 void UHandleCharacterRotationComponent::RotateKeepDegrees( float Degrees )
 {
+
+
 	UE_LOG( LogTemp, Warning, TEXT( "AngDifConstant: %f" ), GetControllerRightAngleDifference() );
-	if (FMath::Abs( GetControllerRightAngleDifference() ) >= Degrees)
+	if ( FMath::Abs( GetControllerRightAngleDifference() ) >= Degrees )
 	{
 		UE_LOG( LogTemp, Warning, TEXT( "AngDif: %f" ), GetControllerRightAngleDifference() );
 
@@ -150,10 +164,12 @@ void UHandleCharacterRotationComponent::RotateKeepDegrees( float Degrees )
 		float AngDif = GetControllerRightAngleDifference();
 		AngDif = FMath::Abs( GetControllerRightAngleDifference() );
 		AngDif = AngDif - Degrees;
-		AngDif = AngDif * (GetControllerRightAngleDifference() / FMath::Abs( GetControllerRightAngleDifference() ));
+		AngDif = AngDif * ( GetControllerRightAngleDifference() / FMath::Abs( GetControllerRightAngleDifference() ) );
 
 		//Using Vectors is easier than manipulating rotators directly
 		FRotator TargetRotation = OwnChar->GetActorForwardVector().RotateAngleAxis( AngDif, FVector( 0.f, 0.f, 1.f ) ).Rotation();
+
+		if ( FMath::IsNearlyEqual( AngDif, 0.f, 0.01f ) ) return;
 
 		LerpSetRotation( TargetRotation );
 
@@ -163,28 +179,36 @@ void UHandleCharacterRotationComponent::RotateKeepDegrees( float Degrees )
 //This doesn't work yet, but I'll leave it for now
 void UHandleCharacterRotationComponent::HandleRotation()
 {
-	if (CurrentMS == EMouseState::None)
+	//This should be removed or fixed
+	if ( PreviousMS == EMouseState::LeftHeld )
 	{
-		
+		return;
 	}
 
 
-	if (CurrentMS == EMouseState::RightHeld || bInputOnRightAxis)
+	if ( CurrentMS == EMouseState::RightHeld || bInputOnRightAxis )
 	{
 		RotateKeepDegrees( 45.f );
+		return;
 	}
 
 
-	if (CurrentMS == EMouseState::None && (!bInputOnRightAxis && !bInputOnForwardAxis) 
-		|| PreviousMS == EMouseState::RightHeld)
+	if ( CurrentMS == EMouseState::None && PreviousMS == EMouseState::RightHeld )
 	{
-
-
-		RotateKeepDegrees(0.f);
-	
+		RotateKeepDegrees( 0.f );
+		return;
 	}
 
-	return;
+	if ( CurrentMS == EMouseState::None && CurrentMAS == EMovementAxisState::None )
+	{
+		if ( !FMath::IsNearlyEqual( GetControllerRightAngleDifference(), 0.f, 0.01f ) )
+		{
+			if ( GetWorld()->GetTimerManager().IsTimerActive( RotationHandle ) ) return;
+
+			UnpauseTimerHandle( RotationHandle );
+
+		}
+	}
 
 }
 
@@ -226,7 +250,7 @@ void UHandleCharacterRotationComponent::LerpSetRotation( FRotator TargetRotation
 
 	LerpAlpha += FApp::GetDeltaTime() / 2;
 
-	if (LerpAlpha >= 1.f)
+	if ( LerpAlpha >= 1.f )
 	{
 		LerpAlpha = 0.f;
 	}
