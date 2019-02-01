@@ -81,12 +81,14 @@ void APlayerCharacter::SetupPlayerInputComponent( class UInputComponent* PlayerI
 	PlayerInputComponent->BindAxis( "CameraZoom", this, &APlayerCharacter::HandleCameraZoom );
 	PlayerInputComponent->BindAction( "Jump", IE_Pressed, this, &APlayerCharacter::HandleJump );
 
+	PlayerInputComponent->BindAction( "Right", IE_Pressed, CharacterRotationComp, &UHandleCharacterRotationComponent::RightMovAxisPressed );
+	PlayerInputComponent->BindAction( "Right", IE_Released, CharacterRotationComp, &UHandleCharacterRotationComponent::RightMovAxisReleased );
 }
 
 
 void APlayerCharacter::Thing( bool yes )
 {
-	if (GEngine)
+	if ( GEngine )
 		GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, FString::Printf( TEXT( "%d THING HAPPNEEEEED! YAAAY!" ), yes ) );
 	Jump();
 }
@@ -126,7 +128,7 @@ void APlayerCharacter::NewMouseState( EMouseState NewState )
 	HandleCameraComp->NewMouseState( NewState );
 	CharacterRotationComp->NewMouseState( NewState );
 
-	switch (NewState)
+	switch ( NewState )
 	{
 	case EMouseState::None:
 	{
@@ -177,8 +179,8 @@ void APlayerCharacter::HandleCameraRotation()
 void APlayerCharacter::HandleCharacterRotation()
 {
 	//Calculate things for holding down right
-	if (PlayerController->CurrentMS == EMouseState::RightHeld ||
-		PlayerController->CurrentMS == EMouseState::BothHeld)
+	if ( PlayerController->CurrentMS == EMouseState::RightHeld ||
+		PlayerController->CurrentMS == EMouseState::BothHeld )
 	{
 		//resetting variables
 		RotationLerpSpeed = 0.f;
@@ -193,35 +195,35 @@ void APlayerCharacter::HandleCharacterRotation()
 		float Angle = FMath::RadiansToDegrees( FMath::Acos( DotProductForward ) );
 
 		//Calculates if the controller is rotated to the right or to the left and sets the direction var
-		if (DotProductRight < 0)
+		if ( DotProductRight < 0 )
 		{
 			CharacterRotationDirection = -1.f;
 		}
-		else if (DotProductRight > 0)
+		else if ( DotProductRight > 0 )
 		{
 			CharacterRotationDirection = 1.f;
 		}
 
 		//Calculating things for moving 
-		if (GetCharacterMovement()->Velocity.Size() != 0)
+		if ( GetCharacterMovement()->Velocity.Size() != 0 )
 		{
 			DegreesToRotate = Angle * CharacterRotationDirection;
 			VectorToRotateTo = GetActorForwardVector().RotateAngleAxis( DegreesToRotate, FVector( 0.f, 0.f, 1.f ) );
 			RotationLerpSpeed = 0.f;
 		}
 
-		if (Angle >= MaxControlRotationDifference && !(GetCharacterMovement()->Velocity.Size()))
+		if ( Angle >= MaxControlRotationDifference && !( GetCharacterMovement()->Velocity.Size() ) )
 		{
-			if (InputComponent->GetAxisValue( "LookHorizontal" ) != 0)
+			if ( InputComponent->GetAxisValue( "LookHorizontal" ) != 0 )
 			{
-				DegreesToRotate = (Angle - MaxControlRotationDifference) * CharacterRotationDirection;
+				DegreesToRotate = ( Angle - MaxControlRotationDifference ) * CharacterRotationDirection;
 				VectorToRotateTo = GetActorForwardVector().RotateAngleAxis( DegreesToRotate, FVector( 0.f, 0.f, 1.f ) );
 				RotationLerpSpeed = 45.f;
 			}
 
 		}
 
-		if (VectorToRotateTo.Size() > 0)
+		if ( VectorToRotateTo.Size() > 0 )
 		{
 			SetCharacterRotationInternal( VectorToRotateTo.Rotation(), RotationLerpSpeed );
 		}
@@ -232,7 +234,7 @@ void APlayerCharacter::HandleCharacterRotation()
 
 void APlayerCharacter::SetCharacterRotationInternal( FRotator RotationToSet, float LerpSpeed )
 {
-	if (LerpSpeed <= 0.f)
+	if ( LerpSpeed <= 0.f )
 	{
 		SetActorRotation( RotationToSet );
 		return;
