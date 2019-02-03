@@ -1,6 +1,7 @@
 #include "HandleCharacterRotationComponent.h"
 #include "PlayerCharacter.h"
 #include "TimerManager.h"
+#include "MainPlayerController.h"
 
 #define PauseTimerHandle(x) GetWorld()->GetTimerManager().PauseTimer(x)
 #define UnpauseTimerHandle(x) GetWorld()->GetTimerManager().UnPauseTimer(x)
@@ -17,24 +18,24 @@ void UHandleCharacterRotationComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OwnChar = Cast<APlayerCharacter>(GetOwner());
-	OwnChar;
+	OwnChar = Cast<APlayerCharacter>( GetOwner() );
+	//OwnChar->PlayerController->MovAxisStateChanged.AddDynamic( this, &UHandleCharacterRotationComponent::NewMovAxisState );
 
 }
 
-void UHandleCharacterRotationComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction)
+void UHandleCharacterRotationComponent::TickComponent( float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction * ThisTickFunction )
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	Super::TickComponent( DeltaTime, TickType, ThisTickFunction );
 
 	HandleRotation();
 
-	UE_LOG(LogTemp, Warning, TEXT("%f"), GetControllerRightAngleDifference());
+	UE_LOG( LogTemp, Warning, TEXT( "%f" ), GetControllerRightAngleDifference() );
 }
 
-//Needs debugging and testing and fixing, this whole file isnt done yet
+//Needs debugging and testing and fixing, this whole file isn't done yet
 void UHandleCharacterRotationComponent::HandleRotation()
 {
-	switch (RotationAction)
+	switch ( RotationAction )
 	{
 
 	case ECharacterRotationAction::E_None:
@@ -44,9 +45,9 @@ void UHandleCharacterRotationComponent::HandleRotation()
 
 	case ECharacterRotationAction::E_InheritControlRotation:
 	{
-		if (!OwnChar->bUseControllerRotationYaw)
+		if ( !OwnChar->bUseControllerRotationYaw )
 		{
-			if (!FMath::IsNearlyEqual(GetControllerRightAngleDifference(), 0.f, 0.01f))
+			if ( !FMath::IsNearlyEqual( GetControllerRightAngleDifference(), 0.f, 0.01f ) )
 			{
 				RotateToCamera();
 			}
@@ -68,25 +69,25 @@ void UHandleCharacterRotationComponent::HandleRotation()
 
 	case ECharacterRotationAction::E_RotateAtAngle:
 	{
-		RotateAtAngle(45.f);
+		RotateAtAngle( 45.f );
 		break;
 	}
 
 	case ECharacterRotationAction::E_RotateToAngle45:
 	{
-		RotateToAngle(45.f);
+		RotateToAngle( 45.f );
 		break;
 	}
 
 	case ECharacterRotationAction::E_RotateToAngle90:
 	{
-		RotateToAngle(90.f);
+		RotateToAngle( 90.f );
 		break;
 	}
 
 	case ECharacterRotationAction::E_RotateToCamera:
 	{
-		if (FMath::IsNearlyEqual(GetControllerRightAngleDifference(), 0.f, 0.01f))
+		if ( FMath::IsNearlyEqual( GetControllerRightAngleDifference(), 0.f, 0.01f ) )
 		{
 			RotationAction = ECharacterRotationAction::E_None;
 		}
@@ -102,95 +103,220 @@ void UHandleCharacterRotationComponent::HandleRotation()
 
 void UHandleCharacterRotationComponent::RightMovAxisPressed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Right Is Pressed"));
+	/*
+		UE_LOG(LogTemp, Warning, TEXT("Right Is Pressed"));
 
-	if (CurrentMS == EMouseState::None)
-	{
-		RotationAction = ECharacterRotationAction::E_RotateAtAngle;
-	}
+		if (CurrentMS == EMouseState::None)
+		{
+			RotationAction = ECharacterRotationAction::E_RotateAtAngle;
+		}
 
-	if (CurrentMS == EMouseState::LeftHeld)
-	{
-		RotationAction = ECharacterRotationAction::E_AddRotation;
-	}
+		if (CurrentMS == EMouseState::LeftHeld)
+		{
+			RotationAction = ECharacterRotationAction::E_AddRotation;
+		}
 
-	if (CurrentMS == EMouseState::RightHeld)
-	{
-		RotationAction = ECharacterRotationAction::E_RotateToAngle90;
-	}
+		if (CurrentMS == EMouseState::RightHeld)
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToAngle90;
+		}
 
-	if (CurrentMS == EMouseState::BothHeld || (CurrentMS == EMouseState::RightHeld && bInputOnForwardAxis))
-	{
-		RotationAction = ECharacterRotationAction::E_RotateToAngle45;
-	}
+		if (CurrentMS == EMouseState::BothHeld || (CurrentMS == EMouseState::RightHeld && bInputOnForwardAxis))
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToAngle45;
+		}
+	*/
 
 }
 
 void UHandleCharacterRotationComponent::RightMovAxisReleased()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Right Is Released"));
+	UE_LOG( LogTemp, Warning, TEXT( "Right Is Released" ) );
 
-	if (CurrentMS == EMouseState::None)
+	if ( CurrentMS == EMouseState::None && !bInputOnForwardAxis )
 	{
 		RotationAction = ECharacterRotationAction::E_RotateToCamera;
 	}
+	/*
+		else if ( CurrentMS == EMouseState::None && bInputOnForwardAxis )
+		{
+			RotationAction = ECharacterRotationAction::E_InheritControlRotation;
+		}*/
+
 	else
 	{
 		//Reset the Rotation action to be what it was before the button was pressed
-		NewMouseState(CurrentMS);
+		NewMovAxisState( CurrentMovAxisState );
 	}
 
 }
 
 void UHandleCharacterRotationComponent::ForwardMovAxisPressed()
 {
-	if (bInputOnRightAxis && CurrentMS == EMouseState::None)
-	{
-		RotationAction = ECharacterRotationAction::E_AddRotation;
-	}
+	/*
+		if (bInputOnRightAxis && CurrentMS == EMouseState::None)
+		{
+			RotationAction = ECharacterRotationAction::E_AddRotation;
+		}
 
-	if (!bInputOnRightAxis && CurrentMS == EMouseState::RightHeld)
-	{
-		RotationAction = ECharacterRotationAction::E_InheritControlRotation;
-	}
+		if (!bInputOnRightAxis && CurrentMS == EMouseState::RightHeld)
+		{
+			RotationAction = ECharacterRotationAction::E_InheritControlRotation;
+		}
 
-	if (bInputOnRightAxis && (CurrentMS == EMouseState::RightHeld || CurrentMS == EMouseState::BothHeld))
-	{
-		RotationAction = ECharacterRotationAction::E_RotateToAngle45;
-	}
+		if (bInputOnRightAxis && (CurrentMS == EMouseState::RightHeld || CurrentMS == EMouseState::BothHeld))
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToAngle45;
+		}
+	*/
 
 }
 
+void UHandleCharacterRotationComponent::ForwardMovAxisReleased()
+{
+	/*
+		if ( bInputOnRightAxis && CurrentMS == EMouseState::None)
+		{
+			RotationAction = ECharacterRotationAction::E_RotateAtAngle;
+		}*/
+}
+
+//This doesn't get called, I need to find out why
 void UHandleCharacterRotationComponent::RightActionButtonReleased()
 {
-	if (CurrentMS == EMouseState::None && !bInputOnRightAxis && !bInputOnForwardAxis)
+	if ( CurrentMS == EMouseState::None && !bInputOnRightAxis && !bInputOnForwardAxis )
 	{
 		RotationAction = ECharacterRotationAction::E_RotateToCamera;
 	}
 }
 
-void UHandleCharacterRotationComponent::NewMouseState(EMouseState NewState)
+void UHandleCharacterRotationComponent::NewMovAxisState( EMovementAxisState NewState )
 {
-	PreviousMS = CurrentMS;
-	CurrentMS = NewState;
+	CurrentMovAxisState = NewState;
 
-	if (PreviousMS == EMouseState::BothHeld)
-	{
-		OwnChar->bUseControllerRotationYaw = false;
-	}
+	ECharacterRotationAction PreviousRotationAction = RotationAction;
 
-	switch (NewState)
+	switch ( NewState )
 	{
-	case EMouseState::None:
+
+	case EMovementAxisState::None:
 	{
-		if (!bInputOnForwardAxis && bInputOnRightAxis)
+		if ( CurrentMS == EMouseState::None || CurrentMS == EMouseState::LeftHeld )
+		{
+			RotationAction = ECharacterRotationAction::E_None;
+		}
+
+		if ( CurrentMS == EMouseState::RightHeld )
 		{
 			RotationAction = ECharacterRotationAction::E_RotateAtAngle;
 		}
 
-		if (bInputOnRightAxis && bInputOnForwardAxis)
+		break;
+	}
+
+	case EMovementAxisState::Forward:
+	{
+		if ( CurrentMS == EMouseState::RightHeld || CurrentMS == EMouseState::BothHeld )
+		{
+
+			RotationAction = ECharacterRotationAction::E_InheritControlRotation;
+		}
+		else
+		{
+			RotationAction = ECharacterRotationAction::E_None;
+		}
+
+		//This isn't done
+
+		break;
+	}
+
+	case EMovementAxisState::Right:
+	{
+		if ( CurrentMS == EMouseState::None )
+		{
+			RotationAction = ECharacterRotationAction::E_RotateAtAngle;
+		}
+
+		if ( CurrentMS == EMouseState::BothHeld )
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToAngle45;
+		}
+
+		if ( CurrentMS == EMouseState::LeftHeld )
 		{
 			RotationAction = ECharacterRotationAction::E_AddRotation;
+		}
+
+		if ( CurrentMS == EMouseState::RightHeld )
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToAngle90;
+		}
+
+		break;
+	}
+
+	case EMovementAxisState::ForwardRight:
+	{
+		if ( CurrentMS == EMouseState::None || CurrentMS == EMouseState::LeftHeld )
+		{
+			RotationAction = ECharacterRotationAction::E_AddRotation;
+		}
+
+		if ( CurrentMS == EMouseState::RightHeld || CurrentMS == EMouseState::BothHeld )
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToAngle45;
+		}
+		break;
+	}
+
+	}
+
+	if ( PreviousRotationAction == ECharacterRotationAction::E_InheritControlRotation && !( RotationAction == ECharacterRotationAction::E_InheritControlRotation ) )
+	{
+		OwnChar->bUseControllerRotationYaw = false;
+	}
+}
+
+void UHandleCharacterRotationComponent::NewMouseState( EMouseState NewState )
+{
+	PreviousMS = CurrentMS;
+	CurrentMS = NewState;
+
+	ECharacterRotationAction PreviousRotationAction = RotationAction;
+
+	if ( PreviousMS == EMouseState::BothHeld )
+	{
+		OwnChar->bUseControllerRotationYaw = false;
+	}
+
+	switch ( NewState )
+	{
+	case EMouseState::None:
+	{
+		//This if-statement is temporary since the RightActionButtonReleased doesn't work atm
+		if ( PreviousMS == EMouseState::RightHeld && !bInputOnForwardAxis && !bInputOnRightAxis )
+		{
+			RotationAction = ECharacterRotationAction::E_RotateToCamera;
+			break;
+		}
+
+		if ( !bInputOnForwardAxis && bInputOnRightAxis )
+		{
+			RotationAction = ECharacterRotationAction::E_RotateAtAngle;
+			break;
+		}
+
+		if ( bInputOnRightAxis && bInputOnForwardAxis )
+		{
+			RotationAction = ECharacterRotationAction::E_AddRotation;
+			break;
+		}
+
+		if ( !bInputOnRightAxis )
+		{
+			RotationAction = ECharacterRotationAction::E_None;
+			break;
 		}
 
 		break;
@@ -198,7 +324,7 @@ void UHandleCharacterRotationComponent::NewMouseState(EMouseState NewState)
 
 	case EMouseState::LeftHeld:
 	{
-		if (bInputOnRightAxis)
+		if ( bInputOnRightAxis )
 		{
 			RotationAction = ECharacterRotationAction::E_AddRotation;
 		}
@@ -206,21 +332,26 @@ void UHandleCharacterRotationComponent::NewMouseState(EMouseState NewState)
 		{
 			RotationAction = ECharacterRotationAction::E_None;
 		}
-		
+
 
 		break;
 	}
 
 	case EMouseState::RightHeld:
 	{
-		if (!bInputOnForwardAxis && !bInputOnRightAxis)
+		if ( !bInputOnForwardAxis && !bInputOnRightAxis )
 		{
 			RotationAction = ECharacterRotationAction::E_RotateAtAngle;
 		}
-		else if (bInputOnRightAxis)
+		else if ( bInputOnRightAxis )
 		{
 			RotationAction = bInputOnForwardAxis ? ECharacterRotationAction::E_RotateToAngle45 :
 				ECharacterRotationAction::E_RotateToAngle90;
+		}
+
+		else if ( !bInputOnRightAxis && bInputOnForwardAxis )
+		{
+			RotationAction = ECharacterRotationAction::E_InheritControlRotation;
 		}
 
 		break;
@@ -228,11 +359,11 @@ void UHandleCharacterRotationComponent::NewMouseState(EMouseState NewState)
 
 	case EMouseState::BothHeld:
 	{
-		if (!bInputOnRightAxis && !bInputOnForwardAxis)
+		if ( !bInputOnRightAxis && !bInputOnForwardAxis )
 		{
 			RotationAction = ECharacterRotationAction::E_InheritControlRotation;
 		}
-		else if (bInputOnRightAxis)
+		else if ( bInputOnRightAxis )
 		{
 			RotationAction = ECharacterRotationAction::E_RotateToAngle45;
 		}
@@ -241,14 +372,20 @@ void UHandleCharacterRotationComponent::NewMouseState(EMouseState NewState)
 	}
 
 	}
+
+	if ( PreviousRotationAction == ECharacterRotationAction::E_InheritControlRotation && !(RotationAction == ECharacterRotationAction::E_InheritControlRotation) )
+	{
+		OwnChar->bUseControllerRotationYaw = false;
+	}
 }
 
-void UHandleCharacterRotationComponent::MovementInputRightAxis(float AxisValue)
+
+void UHandleCharacterRotationComponent::MovementInputRightAxis( float AxisValue )
 {
 	bInputOnRightAxis = AxisValue != 0.f;
 }
 
-void UHandleCharacterRotationComponent::MovementInputForwardAxis(float AxisValue)
+void UHandleCharacterRotationComponent::MovementInputForwardAxis( float AxisValue )
 {
 	bInputOnForwardAxis = AxisValue != 0;
 }
@@ -258,45 +395,45 @@ void UHandleCharacterRotationComponent::MovementInputForwardAxis(float AxisValue
 void UHandleCharacterRotationComponent::RotateToCamera()
 {
 	FRotator TargetRotation = OwnChar->GetActorForwardVector().RotateAngleAxis
-	(GetControllerRightAngleDifference(), FVector(0.f, 0.f, 1.f)).Rotation();
+	( GetControllerRightAngleDifference(), FVector( 0.f, 0.f, 1.f ) ).Rotation();
 
-	LerpSetRotation(TargetRotation);
+	LerpSetRotation( TargetRotation );
 }
 
 //Need to test this
-void UHandleCharacterRotationComponent::RotateToAngle(float Degrees)
+void UHandleCharacterRotationComponent::RotateToAngle( float Degrees )
 {
-	float Direction = OwnChar->InputComponent->GetAxisValue("MoveRight");
+	float Direction = OwnChar->InputComponent->GetAxisValue( "MoveRight" );
 
-	float DegreesToRotate = FMath::Abs(GetControllerRightAngleDifference()) - FMath::Abs(Degrees);
-	DegreesToRotate = DegreesToRotate * Direction;
+	float DegreesToRotate = FMath::Abs( GetControllerRightAngleDifference() ) - FMath::Abs( Degrees );
+	DegreesToRotate = DegreesToRotate * -Direction;
 
-	FRotator TargetRotation = OwnChar->GetActorForwardVector().RotateAngleAxis(DegreesToRotate,
-		FVector(0.f, 0.f, 1.f)).Rotation();
+	FRotator TargetRotation = OwnChar->GetActorForwardVector().RotateAngleAxis( DegreesToRotate,
+		FVector( 0.f, 0.f, 1.f ) ).Rotation();
 
-	LerpSetRotation(TargetRotation);
+	LerpSetRotation( TargetRotation );
 }
 
 //Need to test this
-void UHandleCharacterRotationComponent::RotateAtAngle(float Degrees)
+void UHandleCharacterRotationComponent::RotateAtAngle( float Degrees )
 {
 	//UE_LOG( LogTemp, Warning, TEXT( "AngDifConstant: %f" ), GetControllerRightAngleDifference() );
-	if (FMath::Abs(GetControllerRightAngleDifference()) >= Degrees)
+	if ( FMath::Abs( GetControllerRightAngleDifference() ) >= Degrees )
 	{
 		//UE_LOG( LogTemp, Warning, TEXT( "AngDif: %f" ), GetControllerRightAngleDifference() );
 
 		//Calculate the degrees it needs to rotate to keep a @param Degrees angle from the controller
 		float AngDif = GetControllerRightAngleDifference();
-		AngDif = FMath::Abs(GetControllerRightAngleDifference());
+		AngDif = FMath::Abs( GetControllerRightAngleDifference() );
 		AngDif = AngDif - Degrees;
-		AngDif = AngDif * (GetControllerRightAngleDifference() / FMath::Abs(GetControllerRightAngleDifference()));
+		AngDif = AngDif * ( GetControllerRightAngleDifference() / FMath::Abs( GetControllerRightAngleDifference() ) );
 
 		//Using Vectors is easier than manipulating rotators directly
-		FRotator TargetRotation = OwnChar->GetActorForwardVector().RotateAngleAxis(AngDif, FVector(0.f, 0.f, 1.f)).Rotation();
+		FRotator TargetRotation = OwnChar->GetActorForwardVector().RotateAngleAxis( AngDif, FVector( 0.f, 0.f, 1.f ) ).Rotation();
 
-		if (FMath::IsNearlyEqual(AngDif, 0.f, 0.01f)) return;
-		
-		OwnChar->SetActorRotation(TargetRotation);
+		if ( FMath::IsNearlyEqual( AngDif, 0.f, 0.01f ) ) return;
+
+		OwnChar->SetActorRotation( TargetRotation );
 		//LerpSetRotation(TargetRotation);
 
 	}
@@ -306,58 +443,25 @@ void UHandleCharacterRotationComponent::RotateAtAngle(float Degrees)
 void UHandleCharacterRotationComponent::AddRotation()
 {
 
-	float Direction = FApp::GetDeltaTime() * OwnChar->InputComponent->GetAxisValue("MoveRight");
+	float Direction = FApp::GetDeltaTime() * OwnChar->InputComponent->GetAxisValue( "MoveRight" ) * 100.f;
 
-	OwnChar->AddActorWorldRotation(FRotator(0.f, Direction, 0.f));
+	OwnChar->AddActorWorldRotation( FRotator( 0.f, Direction, 0.f ) );
 }
 
-/*
-
-
-		float RotationValue = GetControllerRightAngleDifference() * -1 * FApp::GetDeltaTime();
-	FQuat RotationToAdd = FQuat( FVector( 0.f, 0.f, 1.f ), RotationValue );
-
-	UE_LOG( LogTemp, Warning, TEXT( "%f %f %f %f" ), RotationToAdd.X, RotationToAdd.Y, RotationToAdd.Z, RotationToAdd.W );
-
-
-	/ *
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage( -1, 0.f, FColor::Green, FString::Printf( TEXT( "Controller Rotation: %f %f %f" ),
-				OwnChar->GetControlRotation().Pitch, OwnChar->GetControlRotation().Yaw, OwnChar->GetControlRotation().Roll ) );
-		}
-	* /
-	if (OwnChar->GetControlRotation() != OwnChar->GetControlRotation())
-	{
-		UE_LOG( LogTemp, Warning, TEXT( "Control Rotation: %d %d %d" ), OwnChar->GetControlRotation().Pitch,
-			OwnChar->GetControlRotation().Yaw, OwnChar->GetControlRotation().Roll );
-	}
-
-	if (!FMath::IsNearlyEqual( GetControllerRightAngleDifference(), 0, 1.f ))
-	{
-		//OwnChar->AddActorWorldRotation(RotationToAdd);
-
-	}
-
-	LerpSetRotation( RotationToAdd.Rotator() );
-
-	//OwnChar->SetActorRotation( NewRot );
-}*/
-
-void UHandleCharacterRotationComponent::LerpSetRotation(FRotator TargetRotation)
+void UHandleCharacterRotationComponent::LerpSetRotation( FRotator TargetRotation )
 {
-	FRotator NewRotation = FMath::RInterpTo(OwnChar->GetActorRotation(), TargetRotation,
-		FApp::GetDeltaTime(), LerpSpeed);
+	FRotator NewRotation = FMath::RInterpTo( OwnChar->GetActorRotation(), TargetRotation,
+		FApp::GetDeltaTime(), LerpSpeed );
 
-	OwnChar->SetActorRotation(NewRotation);
+	OwnChar->SetActorRotation( NewRotation );
 }
 
 float UHandleCharacterRotationComponent::GetControllerRightAngleDifference()
 {
-	FVector ControlYaw = FRotator(0.f, OwnChar->GetControlRotation().Yaw, 0.f).Vector();
-	float DotProductYaw = FVector::DotProduct(ControlYaw, OwnChar->GetActorForwardVector());
-	float DotProductYawRight = FVector::DotProduct(ControlYaw, OwnChar->GetActorRightVector());
-	float AngleRight = FMath::RadiansToDegrees(FMath::Acos(DotProductYaw)) * (DotProductYawRight < 0 ? -1 : 1);
+	FVector ControlYaw = FRotator( 0.f, OwnChar->GetControlRotation().Yaw, 0.f ).Vector();
+	float DotProductYaw = FVector::DotProduct( ControlYaw, OwnChar->GetActorForwardVector() );
+	float DotProductYawRight = FVector::DotProduct( ControlYaw, OwnChar->GetActorRightVector() );
+	float AngleRight = FMath::RadiansToDegrees( FMath::Acos( DotProductYaw ) ) * ( DotProductYawRight < 0 ? -1 : 1 );
 
 	return AngleRight;
 
@@ -367,9 +471,9 @@ float UHandleCharacterRotationComponent::GetControllerRightAngleDifference()
 float UHandleCharacterRotationComponent::GetControllerUpAngleDifference()
 {
 
-	FVector ControlPitch = FRotator(OwnChar->GetControlRotation().Pitch, 0.f, 0.f).Vector();
-	float DotProductPitchUp = FVector::DotProduct(ControlPitch, OwnChar->GetActorUpVector());
-	float AngleUp = FMath::RadiansToDegrees(FMath::Acos(DotProductPitchUp)) - 90.f;
+	FVector ControlPitch = FRotator( OwnChar->GetControlRotation().Pitch, 0.f, 0.f ).Vector();
+	float DotProductPitchUp = FVector::DotProduct( ControlPitch, OwnChar->GetActorUpVector() );
+	float AngleUp = FMath::RadiansToDegrees( FMath::Acos( DotProductPitchUp ) ) - 90.f;
 
 	return AngleUp;
 

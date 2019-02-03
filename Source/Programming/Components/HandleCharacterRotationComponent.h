@@ -3,6 +3,7 @@
 #include "Interfaces/MouseStateInterface.h"
 #include "Interfaces/MovementAxisInterface.h"
 #include "Components/ActorComponent.h"
+#include "MovementAxisStateEnum.h"
 #include "HandleCharacterRotationComponent.generated.h"
 
 UENUM(BlueprintType)
@@ -42,8 +43,13 @@ public:
 	void RightMovAxisReleased();
 
 	void ForwardMovAxisPressed();
+	void ForwardMovAxisReleased();
 
+	UFUNCTION()
 	void RightActionButtonReleased();
+
+	UFUNCTION()
+	void NewMovAxisState( EMovementAxisState NewState );
 
 	void NewMouseState( EMouseState NewState );
 

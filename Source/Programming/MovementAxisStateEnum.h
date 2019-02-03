@@ -2,7 +2,7 @@
 
 #include "MovementAxisStateEnum.generated.h"
 
-UENUM()
+UENUM(BlueprintType)
 enum class EMovementAxisState : uint8
 {
 	None,

@@ -50,13 +50,14 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	EnableInput( PlayerController );
 	/*
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("BeginPlay in character is run"));*/
 
 	PlayerController = Cast<AMainPlayerController>( GetWorld()->GetFirstPlayerController() );
 	PlayerController->MouseStateChanged.AddDynamic( this, &APlayerCharacter::NewMouseState );
+	PlayerController->MovAxisStateChanged.AddDynamic( CharacterRotationComp, &UHandleCharacterRotationComponent::NewMovAxisState );
 
 }
 
@@ -73,6 +74,7 @@ void APlayerCharacter::Tick( float DeltaTime )
 void APlayerCharacter::SetupPlayerInputComponent( class UInputComponent* PlayerInputComponent )
 {
 	Super::SetupPlayerInputComponent( PlayerInputComponent );
+
 	PlayerInputComponent->BindAxis( "MoveForward", this, &APlayerCharacter::HandleMoveForward );
 	PlayerInputComponent->BindAxis( "MoveRight", this, &APlayerCharacter::HandleMoveRight );
 	PlayerInputComponent->BindAxis( "LookVertical", this, &APlayerCharacter::HandleLookVertical );
@@ -83,6 +85,12 @@ void APlayerCharacter::SetupPlayerInputComponent( class UInputComponent* PlayerI
 
 	PlayerInputComponent->BindAction( "Right", IE_Pressed, CharacterRotationComp, &UHandleCharacterRotationComponent::RightMovAxisPressed );
 	PlayerInputComponent->BindAction( "Right", IE_Released, CharacterRotationComp, &UHandleCharacterRotationComponent::RightMovAxisReleased );
+	PlayerInputComponent->BindAction( "Forward", IE_Pressed, CharacterRotationComp, &UHandleCharacterRotationComponent::ForwardMovAxisPressed );
+	PlayerInputComponent->BindAction( "Forward", IE_Released, CharacterRotationComp, &UHandleCharacterRotationComponent::ForwardMovAxisReleased );
+
+	PlayerInputComponent->BindAction( "RightActionButton", IE_Released, CharacterRotationComp, &UHandleCharacterRotationComponent::RightActionButtonReleased );
+
+
 }
 
 

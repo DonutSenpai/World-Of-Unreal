@@ -9,7 +9,7 @@ public:
 	virtual void MovementInputRightAxis( float AxisValue ) = 0;
 	virtual void MovementInputForwardAxis( float AxisValue ) = 0;
 
-	EMovementAxisState CurrentMAS = EMovementAxisState::None;
+	EMovementAxisState CurrentMovAxisState = EMovementAxisState::None;
 
 	bool bInputOnRightAxis = false;
 	bool bInputOnForwardAxis = false;

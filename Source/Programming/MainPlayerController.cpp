@@ -16,11 +16,20 @@ void AMainPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction( "RightActionButton", IE_Pressed, this, &AMainPlayerController::RightActionButtonPressedInternal );
-	InputComponent->BindAction( "RightActionButton", IE_Released, this, &AMainPlayerController::RightActionButtonReleasedInternal );
+	auto &RightABPressed = InputComponent->BindAction( "RightActionButton", IE_Pressed, this, &AMainPlayerController::RightActionButtonPressedInternal );
+	RightABPressed.bConsumeInput = false;
+	auto &RightABReleased = InputComponent->BindAction( "RightActionButton", IE_Released, this, &AMainPlayerController::RightActionButtonReleasedInternal );
+	RightABReleased.bConsumeInput = false;
 
 	InputComponent->BindAction( "LeftActionButton", IE_Pressed, this, &AMainPlayerController::LeftActionButtonPressedInternal );
 	InputComponent->BindAction( "LeftActionButton", IE_Released, this, &AMainPlayerController::LeftActionButtonReleasedInternal );
+
+	auto &RightPressed = InputComponent->BindAction( "Right", IE_Pressed, this, &AMainPlayerController::RightMovAxisPressedInternal );
+	RightPressed.bConsumeInput = false;
+	auto &RightReleased = InputComponent->BindAction( "Right", IE_Released, this, &AMainPlayerController::RightMovAxisReleasedInternal );
+	RightReleased.bConsumeInput = false;
+	InputComponent->BindAction( "Forward", IE_Pressed, this, &AMainPlayerController::ForwardMovAxisPressedInternal );
+	InputComponent->BindAction( "Forward", IE_Released, this, &AMainPlayerController::ForwardMovAxisReleasedInternal );
 
 	//InputComponent->BindAxis("MoveForward", this, &AMainPlayerController::)
 
@@ -29,14 +38,14 @@ void AMainPlayerController::SetupInputComponent()
 
 void AMainPlayerController::SetShowMouse( bool Show )
 {
-	if (Show && CurrentMS == EMouseState::None)
+	if ( Show && CurrentMS == EMouseState::None )
 	{
 		SetMouseLocation( MouseX, MouseY );
 		bShowMouseCursor = true;
 	}
-	else if (!Show)
+	else if ( !Show )
 	{
-		if (CurrentMS == EMouseState::BothHeld)
+		if ( CurrentMS == EMouseState::BothHeld )
 			return;
 
 		GetMousePosition( MouseX, MouseY );
@@ -59,12 +68,12 @@ void AMainPlayerController::RightActionButtonPressedInternal()
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Purple, TEXT( "[RightMouseButton] Pressed" ) );*/
 
-	if (CurrentMS == EMouseState::LeftHeld)
+	if ( CurrentMS == EMouseState::LeftHeld )
 	{
 		CurrentMS = EMouseState::BothHeld;
 	}
 
-	else if (CurrentMS == EMouseState::None)
+	else if ( CurrentMS == EMouseState::None )
 	{
 		CurrentMS = EMouseState::RightHeld;
 	}
@@ -80,12 +89,12 @@ void AMainPlayerController::RightActionButtonReleasedInternal()
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[RightMouseButton] Released" ) );*/
 
-	if (CurrentMS == EMouseState::BothHeld)
+	if ( CurrentMS == EMouseState::BothHeld )
 	{
 		CurrentMS = EMouseState::LeftHeld;
 	}
 
-	else if (CurrentMS == EMouseState::RightHeld)
+	else if ( CurrentMS == EMouseState::RightHeld )
 	{
 		CurrentMS = EMouseState::None;
 	}
@@ -102,12 +111,12 @@ void AMainPlayerController::LeftActionButtonPressedInternal()
 		if (GEngine)
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("[LeftMouseButton] Pressed"));*/
 
-	if (CurrentMS == EMouseState::RightHeld)
+	if ( CurrentMS == EMouseState::RightHeld )
 	{
 		CurrentMS = EMouseState::BothHeld;
 	}
 
-	else if (CurrentMS == EMouseState::None)
+	else if ( CurrentMS == EMouseState::None )
 	{
 		CurrentMS = EMouseState::LeftHeld;
 	}
@@ -125,12 +134,12 @@ void AMainPlayerController::LeftActionButtonReleasedInternal()
 			GEngine->AddOnScreenDebugMessage( -1, 15.0f, FColor::Yellow, TEXT( "[LeftMouseButton] Released" ) );*/
 
 
-	if (CurrentMS == EMouseState::BothHeld)
+	if ( CurrentMS == EMouseState::BothHeld )
 	{
 		CurrentMS = EMouseState::RightHeld;
 	}
 
-	else if (CurrentMS == EMouseState::LeftHeld)
+	else if ( CurrentMS == EMouseState::LeftHeld )
 	{
 		CurrentMS = EMouseState::None;
 	}
@@ -139,6 +148,62 @@ void AMainPlayerController::LeftActionButtonReleasedInternal()
 
 	SetShowMouse( true );
 
+}
+
+void AMainPlayerController::RightMovAxisPressedInternal()
+{
+	if ( CurrentMovAxis == EMovementAxisState::None )
+	{
+		CurrentMovAxis = EMovementAxisState::Right;
+	}
+	else if ( CurrentMovAxis == EMovementAxisState::Forward )
+	{
+		CurrentMovAxis = EMovementAxisState::ForwardRight;
+	}
+	
+	MovAxisStateChanged.Broadcast( CurrentMovAxis );
+}
+
+void AMainPlayerController::RightMovAxisReleasedInternal()
+{
+	if ( CurrentMovAxis == EMovementAxisState::ForwardRight )
+	{
+		CurrentMovAxis = EMovementAxisState::Forward;
+	}
+	else
+	{
+		CurrentMovAxis = EMovementAxisState::None;
+	}
+
+	MovAxisStateChanged.Broadcast( CurrentMovAxis );
+}
+
+void AMainPlayerController::ForwardMovAxisPressedInternal()
+{
+	if ( CurrentMovAxis == EMovementAxisState::None )
+	{
+		CurrentMovAxis = EMovementAxisState::Forward;
+	}
+	else if ( CurrentMovAxis == EMovementAxisState::Right )
+	{
+		CurrentMovAxis = EMovementAxisState::ForwardRight;
+	}
+
+	MovAxisStateChanged.Broadcast( CurrentMovAxis );
+}
+
+void AMainPlayerController::ForwardMovAxisReleasedInternal()
+{
+	if ( CurrentMovAxis == EMovementAxisState::Forward )
+	{
+		CurrentMovAxis = EMovementAxisState::None;
+	}
+	else if ( CurrentMovAxis == EMovementAxisState::ForwardRight )
+	{
+		CurrentMovAxis = EMovementAxisState::Right;
+	}
+
+	MovAxisStateChanged.Broadcast( CurrentMovAxis );
 }
 
 UClickableActorBaseComponent* AMainPlayerController::MouseTraceInternal()
